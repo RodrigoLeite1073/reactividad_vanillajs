@@ -1,4 +1,4 @@
-\*Programación Reactiva con Vainilla JavaScript
+# Programación Reactiva con Vainilla JavaScript
 
 Curso programacion javascript del canal [jonmircha](https://youtube.com/c/jonmircha).
 
