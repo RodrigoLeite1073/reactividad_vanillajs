@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patron Observer</title>
+  </head>
+
+  <body>
+    <h1>Patron Observer</h1>
+    <form id="todo-form">
+      <input type="text" id="todo-item" placeholder="Tarea por hacer" />
+      <input type="submit" value="Agregar" />
+    </form>
+    <h2>Lista de Tareas</h2>
+    <ul id="todo-list"></ul>
+    <script>
+      class Observable {
+        #observers
+        constructor() {
+          this.#observers = []
+        }
+        attach(o) {
+          this.#observers.push(o)
+        }
+
+        dettach(o) {
+          this.#observers = this.#observers.filter(e => e != o)
+        }
+
+        notify(model) {
+          this.#observers.forEach(e => {
+            e.notify(model)
+          })
+        }
+      }
+      class TodoListObservable extends Observable {
+        #todoList
+
+        constructor() {
+          super()
+          this.#todoList = []
+        }
+
+        notify(todos) {
+          super.notify(todos)
+        }
+
+        setState(todo) {
+          this.#todoList.push(...todo)
+          this.notify(this.#todoList)
+        }
+      }
+
+      class LiObserver {
+        #template(todoList) {
+          if (todoList.length < 1) {
+            return `<p><em>Lista sin tareas por hacer</em></p>`
+          }
+
+          let todos = todoList.map(item => `<li>${item}</li>`).join('')
+          return todos
+        }
+        #render(todoList) {
+          const $list = d.getElementById('todo-list')
+          if (!$list) return
+          $list.innerHTML = this.#template(todoList)
+        }
+
+        notify(todoList) {
+          this.#render(todoList)
+        }
+      }
+
+      const d = document,
+        todoList = new TodoListObservable(),
+        liObserver = new LiObserver()
+
+      todoList.attach(liObserver)
+
+      d.addEventListener('DOMContentLoaded', todoList.setState)
+
+      todoList.setState(['Tarea 1', 'Tarea 2', 'Tarea 3', 'Tarea 10'])
+
+      d.addEventListener('submit', e => {
+        if (!e.target.matches('#todo-form')) return false
+
+        e.preventDefault()
+
+        const $item = d.getElementById('todo-item')
+        if (!$item) return
+
+        todoList.setState([$item.value])
+
+        //Limpiar el input
+        $item.value = ''
+        $item.focus()
+      })
+    </script>
+  </body>
+</html>
